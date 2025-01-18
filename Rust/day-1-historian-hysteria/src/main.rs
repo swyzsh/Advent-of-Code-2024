@@ -42,7 +42,7 @@ fn sort_ascending(array: Vec<i32>) -> Vec<i32> {
   return sorted;
 }
 
-fn calc_dist_each(first_arr: Vec<i32>, second_arr: Vec<i32>) -> Vec<i32> {
+fn calc_dist_each(first_arr: &Vec<i32>, second_arr: &Vec<i32>) -> Vec<i32> {
   let mut dist_arr: Vec<i32> = vec![];
   let max_length: usize = cmp::max(first_arr.len(), second_arr.len());
 
@@ -60,7 +60,35 @@ fn calc_total_dist(arr: &Vec<i32>) -> i32 {
   let mut sum: i32 = 0;
 
   for i in 0..arr.len() {
-    sum = sum + arr[i];
+    sum += arr[i];
+  }
+
+  return sum;
+}
+
+fn calc_similarity_each(left_list: &Vec<i32>, right_list: &Vec<i32>) -> Vec<i32> {
+  let mut similarity_list: Vec<i32> = vec![];
+
+  for &left_val in left_list {
+    let mut similarity_score: i32 = 0;
+
+    for &right_val in right_list {
+      if left_val == right_val {
+        similarity_score += left_val;
+      }
+    }
+
+    similarity_list.push(similarity_score);
+  }
+
+  return similarity_list;
+}
+
+fn calc_total_similarity(arr: &Vec<i32>) -> i32 {
+  let mut sum: i32 = 0;
+
+  for i in 0..arr.len() {
+    sum += arr[i];
   }
 
   return sum;
@@ -68,8 +96,6 @@ fn calc_total_dist(arr: &Vec<i32>) -> i32 {
 
 fn main() {
   let file_input = fs::read_to_string("./input.txt").expect("Failed to read the file!");
-
-  // let arr_input: Vec<i32> = vec![3, 4, 4, 3, 2, 5, 1, 3, 3, 9, 3, 3];
   let arr_input: Vec<i32> = file_input
     .trim()
     .lines()
@@ -83,6 +109,8 @@ fn main() {
     .flatten()
     .collect();
 
+  // let arr_input: Vec<i32> = vec![3, 4, 4, 3, 2, 5, 1, 3, 3, 9, 3, 3];
+
   let (left_list, right_list) = sort_to_sides(arr_input);
   println!("Left Side:\n{:?}", left_list);
   println!("Right Side:\n{:?}", right_list);
@@ -94,8 +122,19 @@ fn main() {
   println!("Left Side Sorted:\n{:?}", sorted_left_list);
   println!("Right Side Sorted:\n{:?}", sorted_right_list);
 
-  let dist_arr = calc_dist_each(sorted_left_list, sorted_right_list);
+  let dist_arr = calc_dist_each(&sorted_left_list, &sorted_right_list);
   let total_dist = calc_total_dist(&dist_arr);
   println!("Distance between all the pairs...\n{:?}", dist_arr);
-  println!("Total distance between all the pairs..\n{:?}", total_dist);
+  println!("Total distance between all the pairs...\n{:?}", total_dist);
+
+  let similarity_list = calc_similarity_each(&sorted_left_list, &sorted_right_list);
+  let total_similarity = calc_total_similarity(&similarity_list);
+  println!(
+    "Similarity score for each element in left list to right list...\n{:?}",
+    similarity_list
+  );
+  println!(
+    "Total similarity between all the pairs...\n{:?}",
+    total_similarity
+  );
 }
