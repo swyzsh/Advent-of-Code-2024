@@ -54,9 +54,39 @@ function calcDistanceForEach(
 
 function calcTotalDistance(arr: number[]): number {
   let sum: number = 0;
+
   for (let i = 0; i < arr.length; i++) {
-    sum = sum + arr[i];
+    sum += arr[i];
   }
+
+  return sum;
+}
+
+function calcSimilarityEach(leftList: number[], rightList: number[]): number[] {
+  const similarityList: number[] = [];
+
+  for (const leftVal of leftList) {
+    let similarityScore: number = 0;
+
+    for (const rightVal of rightList) {
+      if (leftVal === rightVal) {
+        similarityScore += leftVal;
+      }
+    }
+
+    similarityList.push(similarityScore);
+  }
+
+  return similarityList;
+}
+
+function calcTotalSimilarity(arr: number[]): number {
+  let sum: number = 0;
+
+  for (let i = 0; i < arr.length; i++) {
+    sum += arr[i];
+  }
+
   return sum;
 }
 
@@ -85,4 +115,12 @@ console.log("Right Side Sorted: \n", sortedRightList);
 const distanceArr = calcDistanceForEach(sortedLeftList, sortedRightList);
 const totalDistance = calcTotalDistance(distanceArr);
 console.log("Distances between all the pairs... \n", distanceArr);
-console.log("Total Distance all the pairs... \n", totalDistance);
+console.log("Total distance between all the pairs... \n", totalDistance);
+
+const similarityList = calcSimilarityEach(sortedLeftList, sortedRightList);
+const totalSimilarity = calcTotalSimilarity(similarityList);
+console.log(
+  "Similarity score for each element in left list to right list... \n",
+  similarityList,
+);
+console.log("Total similarity between all the pairs... \n", totalSimilarity);
