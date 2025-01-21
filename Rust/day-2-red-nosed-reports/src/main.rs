@@ -1,47 +1,85 @@
 use std::fs;
 
 fn check_safe(arr: &Vec<Vec<i32>>) -> i32 {
-  println!("Puzzle Input:\n{:?}", arr);
-
   let mut total_safe_reports: i32 = 0;
 
   for (i, report) in arr.iter().enumerate() {
-    let mut is_ascending: bool = true;
-    let mut is_descending: bool = true;
-    let mut level_safe: bool = true;
-
-    for j in 0..report.len() - 1 {
-      let diff = (report[j] - report[j + 1]).abs();
-
-      if diff < 1 || diff > 3 {
-        level_safe = false;
-        break;
-      }
-
-      if report[j] < report[j + 1] {
-        is_descending = false;
-      } else if report[j] > report[j + 1] {
-        is_ascending = false;
-      }
-    }
-
-    let report_safe: bool = level_safe && (is_ascending || is_descending);
-    if report_safe {
+    let is_safe = dampener(report, 1);
+    if is_safe {
       total_safe_reports += 1;
     }
 
     println!(
-      "Report {}:\n{:?} Check: {}",
+      "Report {}: {:?} | Check: {}",
       i + 1,
       report,
-      if report_safe { "Safe" } else { "Unsafe" }
+      if is_safe { "Safe" } else { "Unsafe" }
     );
   }
 
   return total_safe_reports;
 }
 
+fn dampener(report: &Vec<i32>, level_removals_left: usize) -> bool {
+  if report.len() < 2 {
+    return true;
+  }
+
+  if is_report_safe(report) {
+    return true;
+  }
+
+  if level_removals_left == 0 {
+    return false;
+  }
+
+  for i in 0..report.len() {
+    let mut modified_report = report.clone();
+    modified_report.remove(i);
+    if dampener(&modified_report, level_removals_left - 1) {
+      return true;
+    }
+  }
+
+  return false;
+}
+
+fn is_report_safe(report: &Vec<i32>) -> bool {
+  if report.len() < 2 {
+    return true;
+  }
+
+  let direction = if report[0] < report[1] {
+    "ascending"
+  } else if report[0] > report[1] {
+    "descending"
+  } else {
+    return false;
+  };
+
+  for j in 0..report.len() - 1 {
+    let diff = (report[j] - report[j + 1]).abs();
+
+    match direction {
+      "ascending" => {
+        if report[j] >= report[j + 1] || diff < 1 || diff > 3 {
+          return false;
+        }
+      }
+      "descending" => {
+        if report[j] <= report[j + 1] || diff < 1 || diff > 3 {
+          return false;
+        }
+      }
+      _ => unreachable!(),
+    }
+  }
+
+  return true;
+}
+
 fn main() {
+  // let file_input = fs::read_to_string("./test-input.txt").expect("Failed to read the file!");
   let file_input = fs::read_to_string("./puzzle-input.txt").expect("Failed to read the file!");
   let puzzle_input: Vec<Vec<i32>> = file_input
     .trim()
@@ -54,6 +92,7 @@ fn main() {
         .collect()
     })
     .collect();
+  // println!("Puzzel input...\n{:?}", &puzzle_input);
 
   let total_safe_reports = check_safe(&puzzle_input);
   println!("Total Safe Reports: {:?}", total_safe_reports);
